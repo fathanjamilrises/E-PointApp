@@ -2,7 +2,7 @@
 @section('content')
 
 <h1>Login</h1>
-<a href="{{ route('register') }}">Daftar</a>
+{{-- <a href="{{ route('register') }}">Daftar</a> --}}
 <br>
 <form action="{{ route ('authenticate') }}" method="post">
     @csrf
