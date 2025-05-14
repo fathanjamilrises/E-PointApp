@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Data User</title>
+    <title>Data Pelanggar</title>
     <style>
         body {
             font-family: sans-serif;
@@ -38,6 +37,10 @@
             background-color: #f0f0f0;
         }
 
+        img {
+            border-radius: 6px;
+        }
+
         .btn {
             padding: 5px 10px;
             margin-right: 5px;
@@ -45,7 +48,6 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            display: inline-block;
         }
 
         .btn-dark {
@@ -68,108 +70,95 @@
             color: #155724;
             padding: 10px;
             margin-top: 10px;
-            margin-bottom: 15px;
             border: 1px solid #c3e6cb;
             border-radius: 5px;
         }
 
-        form {
+        .form-container {
             margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-            padding: 5px;
-            margin-right: 5px;
-        }
-
-        input[type="submit"] {
-            padding: 5px 10px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button[type="submit"] {
-            padding: 5px 10px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <h1>Data User</h1>
 
-    {{-- Navigasi --}}
+    <h1>Data Pelanggar</h1>
+
     <a href="{{ route('admin.dashboard') }}">Menu Utama</a>
-    <a href="{{ route('akun.create') }}">+ Tambah User</a>
+    <a href="{{ route('pelanggar.create') }}">+ Tambah Pelanggar</a>
     <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
         @csrf
     </form>
 
-    {{-- Form Pencarian --}}
-    <form action="" method="GET">
+    <form action="" method="GET" class="form-container">
         <label for="cari">Cari :</label>
-        <input type="text" name="cari" id="cari" placeholder="Cari nama/email...">
+        <input type="text" name="cari" id="cari" placeholder="Cari nama/NIS...">
         <input type="submit" value="Cari">
     </form>
 
-    {{-- Notifikasi --}}
     @if(Session::has('success'))
         <div class="success">
             {{ Session::get('success') }}
         </div>
     @endif
 
-    {{-- Tabel User --}}
     <table>
         <thead>
             <tr>
+                <th>Foto</th>
+                <th>NIS</th>
                 <th>Nama</th>
-                <th>Email</th>
-                <th>Role</th>
+                <th>Kelas</th>
+                <th>No Hp</th>
+                <th>Poin</th>
+                <th>Status</th>
                 <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($users as $user)
+            @forelse($pelanggars as $pelanggar)
                 <tr>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->usertype }}</td>
                     <td>
-                        @if ($user->usertype == 'admin')
-                            <a href="{{ route('akun.edit', $user->id) }}" class="btn btn-primary">EDIT</a>
-                        @else
-                            <form action="{{ route('akun.destroy', $user->id) }}" method="POST" 
-                                  onsubmit="return confirm('{{ $user->usertype == 'siswa' ? 'Jika akun siswa dihapus maka data siswa juga akan dihapus, apakah anda yakin' : 'Anda Yakin?' }}')" 
-                                  style="display:inline-block;">
-                                <a href="{{ route('akun.edit', $user->id) }}" class="btn btn-primary">EDIT</a>
+                        <img src="{{ asset('storage/public/siswas/' . $pelanggar->image) }}" width="100px" height="100px">
+                    </td>
+                    <td>{{ $pelanggar->nis }}</td>
+                    <td>{{ $pelanggar->name }}</td>
+                    <td>{{ $pelanggar->tingkatan }} {{ $pelanggar->jurusan }} {{ $pelanggar->kelas }}</td>
+                    <td>{{ $pelanggar->hp }}</td>
+                    <td>{{ $pelanggar->poin_pelanggar }}</td>
+                    <td>
+                        @if ($pelanggar->status == 0)
+                            Tidak Perlu Ditindak
+                        @elseif($pelanggar->status == 1)
+                            <form action="{{ route('pelanggar.statusTindak', $pelanggar->id) }}" method="POST" onsubmit="return confirm('Apakah anda yakin?');">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">HAPUS</button>
+                                @method('PUT')
+                                <button type="submit" class="btn btn-primary">Perlu Ditindak</button>
                             </form>
+                        @elseif($pelanggar->status == 2)
+                            Sudah Ditindak
                         @endif
+                    </td>
+                    <td>
+                        <a href="{{ route('detailPelanggar.show', $pelanggar->id) }}" class="btn btn-dark">Detail</a>
+                        <form action="{{ route('pelanggar.destroy', $pelanggar->id) }}" method="POST" onsubmit="return confirm('Apakah Anda Yakin?');" style="display:inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">Hapus</button>
+                        </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" style="text-align: center; padding: 15px;">Data tidak ditemukan. <a href="{{ route('akun.index') }}">Kembali</a></td>
+                    <td colspan="8">Data tidak ditemukan. <a href="{{ route('pelanggar.index') }}">Kembali</a></td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
-    {{-- Pagination --}}
     <div style="margin-top: 20px;">
-        {{ $users->links() }}
+        {{ $pelanggars->links() }}
     </div>
+
 </body>
 </html>

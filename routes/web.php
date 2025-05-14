@@ -3,8 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginRegisterController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\DetailPelanggaranController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\PelanggaranController;
+use App\Http\Controllers\PelanggarController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +26,10 @@ Route::middleware('auth','admin')->group(function () {
     Route::put('/updateEmail/{akun}',[LoginRegisterController::class, 'updateEmail'])->name('updateEmail');
     Route::put('/updatePassword/{akun}',[LoginRegisterController::class, 'updatePassword'])->name('updatePassword');
     Route::resource('/admin/pelanggaran', PelanggaranController::class);
+    Route::resource('/admin/pelanggar', PelanggarController::class);
+    Route::post('/admin/pelanggar/storePelanggaran', [PelanggarController::class, 'storePelanggaran'])->name('pelanggar.storePelanggaran');
+    Route::put('/admin/pelanggar/statusTindak/{akun}', [PelanggarController::class, 'statusTindak'])-> name('pelanggar.statusTindak');
+    Route::resource('/admin/detailPelanggar', DetailPelanggaranController::class);
     Route::post('/logout', [LoginRegisterController::class, 'logout'])->name('logout');
 });
 
