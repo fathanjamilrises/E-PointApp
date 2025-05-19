@@ -1,95 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Detail Siswa</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #000;
-            padding: 10px;
-            vertical-align: top;
-        }
-
-        th {
-            background-color: #f0f0f0;
-            text-align: left;
-        }
-
-        .center {
-            text-align: center;
-        }
-
-        img {
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        a {
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        h1 {
-            margin-bottom: 10px;
-        }
-    </style>
+    @vite('resources/css/app.css') {{-- Pastikan Tailwind sudah di-compile --}}
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex">
 
-    <h1>Detail Siswa</h1>
-    <a href="{{ route('siswa.index') }}">← Kembali ke Data Siswa</a>
+    {{-- Sidebar --}}
+    <x-sidebar />
 
-    <table>
-        <tr>
-            <td colspan="4" class="center">
-                <img src="{{ asset('storage/public/siswas/' . $siswa->image) }}" width="120px" height="120px" alt="Foto Siswa">
-            </td>
-        </tr>
-        <tr>
-            <th colspan="2">Akun Siswa</th>
-            <th colspan="2">Data Siswa</th>
-        </tr>
-        <tr>
-            <th>Nama</th>
-            <td>{{ $siswa->name }}</td>
-            <th>NIS</th>
-            <td>{{ $siswa->nis }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ $siswa->email }}</td>
-            <th>Kelas</th>
-            <td>{{ $siswa->tingkatan }} {{ $siswa->jurusan }} {{ $siswa->kelas }}</td>
-        </tr>
-        <tr>
-            <th colspan="2"></th>
-            <th>No HP</th>
-            <td>{{ $siswa->hp }}</td>
-        </tr>
-        <tr>
-            <th colspan="2"></th>
-            <th>Status</th>
-            <td>
-                @if ($siswa->status == 1)
-                    Aktif
-                @else
-                    Tidak Aktif
-                @endif
-            </td>
-        </tr>
-    </table>
+    {{-- Main Content --}}
+    <main class="flex-1 p-6 max-w-5xl mx-auto mt-20">
+
+        <h1 class="text-3xl font-bold mb-8 text-gray-900">Detail Siswa</h1>
+
+        <div class="flex flex-col md:flex-row md:items-center md:gap-10 mb-8">
+            <img 
+                src="{{ asset('storage/public/siswas/' . $siswa->image) }}" 
+                alt="Foto Siswa" 
+                class="rounded-lg w-40 h-40 object-cover shadow-lg mx-auto md:mx-0"
+            />
+            <div class="mt-6 md:mt-0">
+                <h2 class="text-xl font-semibold text-gray-700 mb-3 border-b border-gray-200 pb-2">Akun Siswa</h2>
+                <p class="mb-2"><span class="font-semibold text-gray-900">Nama:</span> {{ $siswa->name }}</p>
+                <p><span class="font-semibold text-gray-900">Email:</span> {{ $siswa->email }}</p>
+            </div>
+        </div>
+
+        <div>
+            <h2 class="text-xl font-semibold text-gray-700 mb-3 border-b border-gray-200 pb-2">Data Siswa</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-gray-800">
+                <div>
+                    <p><span class="font-semibold">NIS:</span> {{ $siswa->nis }}</p>
+                </div>
+                <div>
+                    <p><span class="font-semibold">Kelas:</span> {{ $siswa->tingkatan }} {{ $siswa->jurusan }} {{ $siswa->kelas }}</p>
+                </div>
+                <div>
+                    <p><span class="font-semibold">No HP:</span> {{ $siswa->hp }}</p>
+                </div>
+                <div>
+                    <p>
+                        <span class="font-semibold">Status:</span> 
+                        @if ($siswa->status == 1)
+                            <span class="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-sm">Aktif</span>
+                        @else
+                            <span class="inline-block px-3 py-1 rounded-full bg-red-100 text-red-700 font-semibold text-sm">Tidak Aktif</span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
 </body>
 </html>

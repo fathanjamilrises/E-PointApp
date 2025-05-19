@@ -1,175 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
     <title>Data User</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-        }
-
-        h1 {
-            margin-bottom: 15px;
-        }
-
-        a {
-            margin-right: 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background-color: #f0f0f0;
-        }
-
-        .btn {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            display: inline-block;
-        }
-
-        .btn-dark {
-            background-color: #343a40;
-            color: white;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            margin-top: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #c3e6cb;
-            border-radius: 5px;
-        }
-
-        form {
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        input[type="text"] {
-            padding: 5px;
-            margin-right: 5px;
-        }
-
-        input[type="submit"] {
-            padding: 5px 10px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button[type="submit"] {
-            padding: 5px 10px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    @vite('resources/css/app.css') {{-- Pastikan Tailwind sudah dikompilasi --}}
 </head>
-<body>
-    <h1>Data User</h1>
 
-    {{-- Navigasi --}}
-    <a href="{{ route('admin.dashboard') }}">Menu Utama</a>
-    <a href="{{ route('akun.create') }}">+ Tambah User</a>
-    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-        @csrf
-    </form>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-    {{-- Form Pencarian --}}
-    <form action="" method="GET">
-        <label for="cari">Cari :</label>
-        <input type="text" name="cari" id="cari" placeholder="Cari nama/email...">
-        <input type="submit" value="Cari">
-    </form>
+    <div class="flex min-h-screen">
 
-    {{-- Notifikasi --}}
-    @if(Session::has('success'))
-        <div class="success">
-            {{ Session::get('success') }}
-        </div>
-    @endif
+        {{-- Sidebar --}}
+        <x-sidebar />
 
-    {{-- Tabel User --}}
-    <table>
-        <thead>
-            <tr>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($users as $user)
-                <tr>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->usertype }}</td>
-                    <td>
-                        @if ($user->usertype == 'admin')
-                            <a href="{{ route('akun.edit', $user->id) }}" class="btn btn-primary">EDIT</a>
-                        @else
-                            <form action="{{ route('akun.destroy', $user->id) }}" method="POST" 
-                                  onsubmit="return confirm('{{ $user->usertype == 'siswa' ? 'Jika akun siswa dihapus maka data siswa juga akan dihapus, apakah anda yakin' : 'Anda Yakin?' }}')" 
-                                  style="display:inline-block;">
-                                <a href="{{ route('akun.edit', $user->id) }}" class="btn btn-primary">EDIT</a>
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">HAPUS</button>
-                            </form>
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4" style="text-align: center; padding: 15px;">Data tidak ditemukan. <a href="{{ route('akun.index') }}">Kembali</a></td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        {{-- Main content --}}
+        <main class="flex-1 p-6">
 
-    {{-- Pagination --}}
-    <div style="margin-top: 20px;">
-        {{ $users->links() }}
+            {{-- Header --}}
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Data User</h1>
+            </div>
+            <div class="flex items-center justify-between mb-6">
+                {{-- Search --}}
+                <form action="" method="GET" class="mb-4 flex items-center space-x-2">
+                    <label for="cari" class="text-sm">Cari :</label>
+                    <input type="text" name="cari" id="cari" placeholder="Cari nama/NIS..."
+                        class="px-3 py-2 border rounded-md w-64">
+                    <button type="submit"
+                        class="px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-700">Cari</button>
+                </form>
+                <a href="{{ route('akun.create') }}"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700">+
+                    Tambah User</a>
+            </div>
+
+
+            {{-- Notifikasi --}}
+            @if (Session::has('success'))
+                <div class="mb-6 p-4 bg-green-100 text-green-800 rounded border border-green-300">
+                    {{ Session::get('success') }}
+                </div>
+            @endif
+
+            {{-- Tabel User --}}
+            <div class="overflow-x-auto bg-white shadow rounded-lg">
+                <table class="min-w-full text-left text-gray-700 text-sm">
+                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
+                        <tr>
+                            <th class="px-6 py-3">Nama</th>
+                            <th class="px-6 py-3">Email</th>
+                            <th class="px-6 py-3">Role</th>
+                            <th class="px-6 py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($users as $user)
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-6 py-4">{{ $user->name }}</td>
+                                <td class="px-6 py-4">{{ $user->email }}</td>
+                                <td class="px-6 py-4">{{ $user->usertype }}</td>
+                                <td class="px-6 py-4 text-center">
+                                    @if ($user->usertype == 'admin')
+                                        <a href="{{ route('akun.edit', $user->id) }}"
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800 transition"
+                                                title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M16.862 4.487a2.1 2.1 0 113.02 2.92l-.753.753-3.02-3.02.753-.753zM15.225 6.125L4.5 16.85V19.5h2.65L17.775 8.775l-2.55-2.55z" />
+                                                </svg>
+                                            </a>
+                                    @else
+                                        <form action="{{ route('akun.destroy', $user->id) }}" method="POST"
+                                            onsubmit="return confirm('{{ $user->usertype == 'siswa' ? 'Jika akun siswa dihapus maka data siswa juga akan dihapus, apakah anda yakin?' : 'Anda yakin?' }}')"
+                                            class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <a href="{{ route('akun.edit', $user->id) }}"
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800 transition"
+                                                title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M16.862 4.487a2.1 2.1 0 113.02 2.92l-.753.753-3.02-3.02.753-.753zM15.225 6.125L4.5 16.85V19.5h2.65L17.775 8.775l-2.55-2.55z" />
+                                                </svg>
+                                            </a>
+                                            <button type="submit"
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-800 transition"
+                                                title="Hapus">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                    class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-6 text-gray-500">
+                                    Data tidak ditemukan. <a href="{{ route('akun.index') }}"
+                                        class="text-blue-600 hover:underline">Kembali</a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            <div class="mt-6">
+                {{ $users->links() }}
+            </div>
+        </main>
+
     </div>
+
 </body>
+
 </html>

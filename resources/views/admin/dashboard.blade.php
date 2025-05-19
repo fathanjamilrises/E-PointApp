@@ -1,138 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-gray-50">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard Admin</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-        }
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        .nav-link {
-            margin-right: 15px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        h1, h3 {
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 6px 12px;
-            text-decoration: none;
-            background-color: #333;
-            color: #fff;
-            border-radius: 4px;
-        }
-    </style>
+    {{-- Heroicons CDN untuk icon (atau bisa install npm dan import) --}}
+    <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body>
+<body class="h-full font-sans text-gray-900">
+    <div class="flex h-screen">
+        {{-- Sidebar --}}
+        <x-sidebar />
+        {{-- Main Content --}}
+       <main class="flex-1 p-6 bg-gray-50 overflow-y-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        <!-- Stat Card -->
+        <div class="rounded-xl bg-white p-6 shadow border">
+            <div class="text-sm text-gray-500">Jumlah Siswa</div>
+            <div class="mt-2 text-2xl font-semibold text-blue-600">{{ $jmlSiswas }}</div>
+            <div class="text-xs text-green-600 mt-1">+5.2% dari bulan lalu</div>
+        </div>
 
-    <h1>Dashboard Admin</h1>
+        <div class="rounded-xl bg-white p-6 shadow border">
+            <div class="text-sm text-gray-500">Jumlah Pelanggar</div>
+            <div class="mt-2 text-2xl font-semibold text-blue-600">{{ $jmlPelanggars }}</div>
+            <div class="text-xs text-red-600 mt-1">-2.3% dari bulan lalu</div>
+        </div>
+    </div>
 
-    {{-- Navigasi --}}
-    <nav>
-        <a href="{{ route('siswa.index') }}" class="nav-link">Data Siswa</a>
-        <a href="{{ route('akun.index') }}" class="nav-link">Data Akun</a>
-        <a href="{{ route('pelanggaran.index') }}" class="nav-link">Data Pelanggaran</a>
-        <a href="{{ route('pelanggar.index') }}" class="nav-link">Data Pelanggar</a>
-        <a href="{{ route('logout') }}" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
-        <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: none;">
-            @csrf
-        </form>
-    </nav>
+    <!-- Grafik -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Statistik Pelanggaran</h3>
+            <canvas id="chartPelanggaran"></canvas>
+        </div>
 
-    {{-- Informasi --}}
-    @if($message = Session::get('success'))
-        <p style="color: green; font-weight: bold;">{{ $message }}</p>
-    @else
-        <p>Selamat datang! Kamu telah login sebagai admin.</p>
-    @endif
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Statistik Siswa</h3>
+            <canvas id="chartSiswa"></canvas>
+        </div>
+    </div>
 
-    <h3>Jumlah Siswa: {{ $jmlSiswas }}</h3>
-    <h3>Jumlah Pelanggar: {{ $jmlPelanggars }}</h3>
+    <!-- Tabel Top 10 -->
+    <div class="bg-white p-6 rounded-xl shadow border">
+        <h3 class="text-xl font-semibold mb-4 text-gray-800">Top 10 Siswa dengan Poin Tertinggi</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50 text-gray-600 font-semibold">
+                    <tr>
+                        <th class="p-3 text-left">Foto</th>
+                        <th class="p-3 text-left">Nama</th>
+                        <th class="p-3 text-left">Kelas</th>
+                        <th class="p-3 text-left">Poin</th>
+                        <th class="p-3 text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach ($pelanggars as $p)
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-3">
+                                <img src="{{ asset('storage/siswas/' . $p->image) }}" class="w-10 h-10 rounded-full object-cover">
+                            </td>
+                            <td class="p-3">{{ $p->name }}</td>
+                            <td class="p-3">{{ $p->tingkatan }} {{ $p->jurusan }} {{ $p->kelas }}</td>
+                            <td class="p-3 font-semibold text-blue-600">{{ $p->poin_pelanggar }}</td>
+                            <td class="p-3">
+                                <a href="{{ route('pelanggar.show', $p->id) }}" class="text-blue-600 hover:underline text-sm">Detail</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
 
-    {{-- Tabel Siswa Terbanyak Poin --}}
-    <h1>Top 10 Siswa dengan Poin Pelanggaran Tertinggi</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Foto</th>
-                <th>NIS</th>
-                <th>Nama</th>
-                <th>Kelas</th>
-                <th>No HP</th>
-                <th>Poin</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($pelanggars as $pelanggar)
-                <tr>
-                    <td>
-                        <img src="{{ asset('storage/siswas/' . $pelanggar->image) }}" width="80px" height="80px" alt="Foto Siswa">
-                    </td>
-                    <td>{{ $pelanggar->nis }}</td>
-                    <td>{{ $pelanggar->name }}</td>
-                    <td>{{ $pelanggar->tingkatan }} {{ $pelanggar->jurusan }} {{ $pelanggar->kelas }}</td>
-                    <td>{{ $pelanggar->hp }}</td>
-                    <td>{{ $pelanggar->poin_pelanggar }}</td>
-                    <td>
-                        <a href="{{ route('pelanggar.show', $pelanggar->id) }}" class="btn">Lihat Detail</a>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7">Data tidak ditemukan.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
 
-    {{-- Tabel Pelanggaran Terbanyak --}}
-    <h1>Top 10 Pelanggaran yang Sering Dilakukan</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Nama Pelanggaran</th>
-                <th>Konsekuensi</th>
-                <th>Poin</th>
-                <th>Total Terjadi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($hitung as $hit)
-                <tr>
-                    <td>{{ $hit->jenis }}</td>
-                    <td>{{ $hit->konsekuensi }}</td>
-                    <td>{{ $hit->poin }}</td>
-                    <td>{{ $hit->totals }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4">Data tidak ditemukan.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx1 = document.getElementById('chartPelanggaran');
+    const chart1 = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($hitung->pluck('jenis')) !!},
+            datasets: [{
+                label: 'Jumlah',
+                data: {!! json_encode($hitung->pluck('totals')) !!},
+                backgroundColor: '#3b82f6'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

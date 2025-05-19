@@ -1,146 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Siswa</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-        }
-
-        h1, h2 {
-            margin-bottom: 10px;
-        }
-
-        a {
-            text-decoration: none;
-            font-weight: bold;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-
-        label {
-            display: block;
-            margin-top: 15px;
-            font-weight: bold;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="password"],
-        select,
-        input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 8px 16px;
-            margin-top: 20px;
-            margin-right: 10px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button[type="submit"] {
-            background-color: #007bff;
-            color: white;
-        }
-
-        button[type="reset"] {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .alert {
-            background-color: #f8d7da;
-            padding: 10px;
-            margin-top: 15px;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @vite('resources/css/app.css') {{-- Pastikan Tailwind dikompilasi --}}
 </head>
-<body>
 
-    <h1>Tambah Siswa</h1>
-    <a href="{{ route('siswa.index') }}">← Kembali ke Data Siswa</a>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-    @if ($errors->any())
-        <div class="alert">
-            <ul style="margin: 0;">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <div class="flex min-h-screen">
+        {{-- Sidebar --}}
+        <x-sidebar />
 
-    <form action="{{ route('siswa.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+        {{-- Main Content --}}
+        <main class="flex-1 p-6">
+            {{-- Header --}}
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Tambah Siswa</h1>
+            </div>
 
-        <h2>Akun Siswa</h2>
+            {{-- Error Alert --}}
+            @if ($errors->any())
+                <div class="mb-4 p-4 bg-red-100 border border-red-300 text-red-700 rounded-md">
+                    <ul class="list-disc pl-5 space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-        <label>Nama Lengkap</label>
-        <input type="text" name="name" id="name" value="{{ old('name') }}" required>
+            {{-- Form --}}
+            <form action="{{ route('siswa.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 bg-white p-6 rounded-lg shadow">
+                @csrf
 
-        <label>Email Address</label>
-        <input type="email" name="email" id="email" value="{{ old('email') }}" required>
+                {{-- Akun Siswa --}}
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Akun Siswa</h2>
 
-        <label>Password</label>
-        <input type="password" name="password" id="password" required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
+                            <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                        </div>
 
-        <label>Confirm Password</label>
-        <input type="password" name="password_confirmation" id="password_confirmation" required>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email" name="email" id="email" value="{{ old('email') }}" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                        </div>
 
-        <h2>Data Siswa</h2>
-        
-        <label>Foto Siswa</label>
-        <input type="file" name="image" accept="image/*" required>
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" name="password" id="password" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                        </div>
 
-        <label>NIS Siswa</label>
-        <input type="text" name="nis" value="{{ old('nis') }}" required>
+                        <div>
+                            <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                            <input type="password" name="password_confirmation" id="password_confirmation" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                        </div>
+                    </div>
+                </div>
 
-        <label>Tingkatan</label>
-        <select name="tingkatan" required>
-            <option value="">Pilih Tingkatan</option>
-            <option value="X">X</option>
-            <option value="XI">XI</option>
-            <option value="XII">XII</option>
-        </select>
+                {{-- Data Siswa --}}
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Data Siswa</h2>
 
-        <label>Jurusan</label>
-        <select name="jurusan" required>
-            <option value="">Pilih Jurusan</option>
-            <option value="TBSM">TBSM</option>
-            <option value="TJKT">TJKT</option>
-            <option value="PPLG">PPLG</option>
-            <option value="DKV">DKV</option>
-            <option value="TOI">TOI</option>
-        </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="image" class="block text-sm font-medium text-gray-700">Foto Siswa</label>
+                            <input type="file" name="image" accept="image/*" required
+                                class="mt-1 block w-full text-sm file:mr-4 file:py-2 file:px-4 file:border file:rounded-md file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        </div>
 
-        <label>Kelas</label>
-        <select name="kelas" required>
-            <option value="">Pilih Kelas</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-        </select>
+                        <div>
+                            <label for="nis" class="block text-sm font-medium text-gray-700">NIS Siswa</label>
+                            <input type="text" name="nis" id="nis" value="{{ old('nis') }}" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                        </div>
 
-        <label>No HP</label>
-        <input type="text" name="hp" value="{{ old('hp') }}" required>
+                        <div>
+                            <label for="tingkatan" class="block text-sm font-medium text-gray-700">Tingkatan</label>
+                            <select name="tingkatan" id="tingkatan" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                                <option value="">Pilih Tingkatan</option>
+                                <option value="X">X</option>
+                                <option value="XI">XI</option>
+                                <option value="XII">XII</option>
+                            </select>
+                        </div>
 
-        <button type="submit">SIMPAN DATA</button>
-        <button type="reset">RESET DATA</button>
-    </form>
+                        <div>
+                            <label for="jurusan" class="block text-sm font-medium text-gray-700">Jurusan</label>
+                            <select name="jurusan" id="jurusan" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                                <option value="">Pilih Jurusan</option>
+                                <option value="TBSM">TBSM</option>
+                                <option value="TJKT">TJKT</option>
+                                <option value="PPLG">PPLG</option>
+                                <option value="DKV">DKV</option>
+                                <option value="TOI">TOI</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="kelas" class="block text-sm font-medium text-gray-700">Kelas</label>
+                            <select name="kelas" id="kelas" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                                <option value="">Pilih Kelas</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="hp" class="block text-sm font-medium text-gray-700">No HP</label>
+                            <input type="text" name="hp" id="hp" value="{{ old('hp') }}" required
+                                class="mt-1 block w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Tombol --}}
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="reset"
+                        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Reset</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Simpan</button>
+                </div>
+            </form>
+        </main>
+    </div>
 
 </body>
+
 </html>
